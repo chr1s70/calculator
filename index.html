@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commission Price Generator</title>
+  <!-- Определяем цены в начале документа -->
+  <script>
+    const prices = {
+      types: {
+        "Sketch": {
+          basePrice: 50,
+          extraPicturePrice: 40,
+          extraCharacterPrice: 30
+        },
+        "Render": {
+          basePrice: 100,
+          extraPicturePrice: 80,
+          extraCharacterPrice: 75
+        },
+        "Full": {
+          basePrice: 150,
+          extraPicturePrice: 120,
+          extraCharacterPrice: 110
+        }
+      },
+      versionMultiplier: 0.3
+    };
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #FF8D00;
+      font-size: clamp(1.5em, 4vw, 2em);
+      margin-bottom: 15px;
+    }
+    .container {
+      max-width: 600px; /* Подставь ширину твоего изображения Prices.png */
+      margin: 0 auto;
+      width: 100%;
+    }
+    .image-area {
+      width: 100%;
+      height: auto;
+      margin: 0 auto 15px auto;
+      overflow: hidden;
+    }
+    .image-area img {
+      width: 100%;
+      height: auto;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+    .input-group, .character-input {
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+    }
+    .input-group label, .character-input label {
+      color: #fff;
+      text-align: right;
+      flex: 1;
+      min-width: 150px;
+      padding-right: 10px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+    }
+    select, input {
+      padding: 5px;
+      flex: 1;
+      min-width: 60px;
+      max-width: 120px;
+      height: 25px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #FF8D00;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+      width: auto;
+      min-width: 100px;
+      margin: 0;
+    }
+    button:hover {
+      background-color: #E67E00;
+    }
+    #result {
+      font-size: clamp(1.2em, 3vw, 1.5em);
+      margin-top: 15px;
+      color: #FF8D00;
+      width: 100%;
+      max-width: 100%;
+    }
+    #summary {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-radius: 5px;
+      text-align: left;
+      font-size: clamp(1em, 2.5vw, 1.2em);
+      color: #fff;
+      width: 100%;
+      max-width: 100%;
+      white-space: pre-wrap; /* Сохраняем переносы строк */
+    }
+    #copyButton {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #FF8D00;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    #copyButton:hover {
+      background-color: #E67E00;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        max-width: 90%;
+      }
+      .input-group label, .character-input label {
+        width: 100%;
+        text-align: center;
+        padding-right: 0;
+        min-width: 0;
+      }
+      select, input {
+        width: 50%;
+        min-width: 50px;
+      }
+      .button-group {
+        flex-direction: column;
+        gap: 5px;
+      }
+      button {
+        width: 70%;
+      }
+      .image-area img {
+        max-height: 60vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        max-width: 95%;
+      }
+      h1 {
+        font-size: clamp(1.2em, 5vw, 1.5em);
+      }
+      .input-group, .character-input {
+        flex-direction: column;
+        gap: 5px;
+      }
+      select, input {
+        width: 80%;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      button {
+        width: 90%;
+      }
+      #result {
+        font-size: clamp(1em, 4vw, 1.2em);
+      }
+      #summary {
+        font-size: clamp(0.9em, 3vw, 1em);
+      }
+      .image-area img {
+        max-height: 40vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Commission Price Generator</h1>
+    <div class="image-area">
+      <img src="Prices.png" alt="Commission Image">
+    </div>
+    <div class="input-group">
+      <label for="type">Select Type:</label>
+      <select id="type">
+        <option value="Sketch">Sketch</option>
+        <option value="Render">Render</option>
+        <option value="Full">Full</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="extraPictures">Number of Pictures:</label>
+      <input type="number" id="extraPictures" min="1" value="1">
+    </div>
+    <div id="characterInputs"></div>
+    <div class="input-group">
+      <label for="altVersion">Number of Versions:</label>
+      <input type="number" id="altVersion" min="0" value="0">
+    </div>
+    <div class="button-group">
+      <button onclick="resetForm()">Reset</button>
+    </div>
+    <div id="result">Total: 0.00$</div>
+    <div id="summary"></div>
+    <button id="copyButton" onclick="copySummary()">Copy Summary</button>
+  </div>
+
+  <script>
+    // Массив для хранения значений персонажей для каждой картинки
+    let characterValues = [];
+
+    // Автоматический вызов функции при загрузке страницы
+    window.onload = function() {
+      updateCharacterInputs();
+      calculatePrice();
+    };
+
+    // Функция для обновления полей ввода персонажей
+    function updateCharacterInputs() {
+      const extraPictures = parseInt(document.getElementById('extraPictures').value);
+      const characterInputsDiv = document.getElementById('characterInputs');
+      
+      if (characterValues.length === 0 || characterValues.length < extraPictures) {
+        while (characterValues.length < extraPictures) {
+          characterValues.push(characterValues.length < 1 ? 1 : 1);
+        }
+      } else if (characterValues.length > extraPictures) {
+        characterValues = characterValues.slice(0, extraPictures);
+      }
+
+      characterInputsDiv.innerHTML = '';
+
+      for (let i = 0; i < extraPictures; i++) {
+        const div = document.createElement('div');
+        div.className = 'character-input';
+        div.innerHTML = `
+          <label for="characters_${i}">Number of Characters (Picture ${i + 1}):</label>
+          <input type="number" id="characters_${i}" min="1" value="${characterValues[i] || 1}">
+        `;
+        characterInputsDiv.appendChild(div);
+
+        document.getElementById(`characters_${i}`).addEventListener('input', function() {
+          characterValues[i] = parseInt(this.value);
+          calculatePrice();
+        });
+      }
+
+      calculatePrice();
+    }
+
+    // Функция для расчёта цены и генерации текста
+    function calculatePrice() {
+      const type = document.getElementById('type').value;
+      const extraPictures = parseInt(document.getElementById('extraPictures').value);
+      const altVersion = parseInt(document.getElementById('altVersion').value);
+
+      const typePrices = prices.types[type];
+      const basePrice = typePrices.basePrice;
+      const extraPicturePrice = typePrices.extraPicturePrice;
+      const extraCharacterPrice = typePrices.extraCharacterPrice;
+      const versionMultiplier = prices.versionMultiplier;
+
+      let total = basePrice;
+      const additionalPictures = extraPictures > 0 ? extraPictures - 1 : 0;
+      total += additionalPictures * extraPicturePrice;
+
+      let totalChargeableCharacters = 0;
+      for (let i = 0; i < extraPictures; i++) {
+        const charactersForPicture = parseInt(document.getElementById(`characters_${i}`).value) || 1;
+        if (charactersForPicture >= 2) {
+          const chargeableCharacters = charactersForPicture - 1;
+          totalChargeableCharacters += chargeableCharacters;
+        }
+      }
+      total += totalChargeableCharacters * extraCharacterPrice;
+
+      const versionCost = (basePrice * versionMultiplier) * altVersion;
+      total += versionCost;
+
+      document.getElementById('result').innerHTML = `Total: ${total.toFixed(2)}$`;
+
+      // Генерация текста для саммари
+      let summaryText = "Commission summary\n";
+      summaryText += `Type: ${type}\n`;
+      summaryText += `Number of Pictures: ${extraPictures}\n`;
+      for (let i = 0; i < extraPictures; i++) {
+        const characters = parseInt(document.getElementById(`characters_${i}`).value) || 1;
+        summaryText += `Number of Characters (Picture ${i + 1}): ${characters}\n`;
+      }
+      summaryText += `Number of Versions: ${altVersion}\n`;
+      summaryText += `Total: ${total.toFixed(2)}$`;
+
+      document.getElementById('summary').innerText = summaryText;
+    }
+
+    // Функция для сброса формы
+    function resetForm() {
+      document.getElementById('type').value = 'Sketch';
+      document.getElementById('extraPictures').value = '1';
+      document.getElementById('altVersion').value = '0';
+      characterValues = [1];
+      updateCharacterInputs();
+    }
+
+    // Функция для копирования текста
+    function copySummary() {
+      const summaryText = document.getElementById('summary').innerText;
+      navigator.clipboard.writeText(summaryText)
+        .then(() => alert('Summary copied to clipboard!'))
+        .catch(err => console.error('Ошибка копирования:', err));
+    }
+
+    // Автоматический пересчёт при изменении значений
+    document.getElementById('extraPictures').addEventListener('input', updateCharacterInputs);
+    document.getElementById('type').addEventListener('change', calculatePrice);
+    document.getElementById('altVersion').addEventListener('input', calculatePrice);
+  </script>
+</body>
+</html>
