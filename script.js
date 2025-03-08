@@ -2,8 +2,11 @@ function calculatePrice() {
   // Получаем значения из формы
   const basePrice = parseInt(document.getElementById('type').value);
   const extraPictures = parseInt(document.getElementById('extraPictures').value);
-  const extraCharacters = parseInt(document.getElementById('extraCharacters').value);
+  const extraCharactersInput = document.getElementById('extraCharacters');
   const altVersion = parseInt(document.getElementById('altVersion').value);
+
+  // Синхронизация количества персонажей с количеством картинок
+  extraCharactersInput.value = extraPictures > 0 ? extraPictures : 0;
 
   // Цены за дополнительные элементы в зависимости от типа
   let extraPicturePrice, extraCharacterPrice;
@@ -21,9 +24,17 @@ function calculatePrice() {
   // Расчёт общей стоимости
   let total = basePrice;
   total += extraPictures * extraPicturePrice;
-  total += extraCharacters * extraCharacterPrice;
-  total += (basePrice * altVersion) / 100; // Альтернативная версия как процент от базы
+  // Дополнительные персонажи считаются для каждой картинки
+  total += extraPictures * extraCharacterPrice; // Умножаем на количество картинок
+  total += (basePrice * altVersion) / 100; // Процент только от базовой цены
 
-  // Вывод результата
+  // Вывод результата с двумя знаками после запятой
   document.getElementById('result').innerHTML = `Total: $${total.toFixed(2)}`;
 }
+
+// Обновление количества персонажей при изменении картинок
+document.getElementById('extraPictures').addEventListener('input', function() {
+  const extraPictures = parseInt(this.value);
+  const extraCharactersInput = document.getElementById('extraCharacters');
+  extraCharactersInput.value = extraPictures > 0 ? extraPictures : 0;
+});
