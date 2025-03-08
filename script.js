@@ -28,8 +28,8 @@ function calculatePrice() {
   total += extraPictures * extraCharacterPrice; // Умножаем на количество картинок
   total += (basePrice * altVersion) / 100; // Процент только от базовой цены
 
-  // Вывод результата с двумя знаками после запятой
-  document.getElementById('result').innerHTML = `Total: $${total.toFixed(2)}`;
+  // Вывод результата с двумя знаками после запятой и $ после числа
+  document.getElementById('result').innerHTML = `Total: ${total.toFixed(2)}$`;
 }
 
 // Обновление количества персонажей при изменении картинок
