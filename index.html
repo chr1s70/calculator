@@ -3,21 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Price Calculator</title>
+  <title>Commission Price Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #fff; text-align: center; padding: 20px; }
-    h1 { color: #ff6200; }
-    .container { max-width: 600px; margin: 0 auto; }
-    select, input { padding: 5px; margin: 5px; }
-    button { padding: 10px 20px; background-color: #ff6200; color: #fff; border: none; cursor: pointer; }
-    button:hover { background-color: #e65c00; }
-    #result { font-size: 1.5em; margin-top: 20px; color: #ff6200; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      color: #ff6200;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .image-area {
+      width: 100%;
+      height: 300px;
+      background-color: #fff;
+      margin-bottom: 20px;
+      border: 2px dashed #ccc;
+    }
+    .input-group {
+      margin: 15px 0;
+      text-align: left;
+      display: flex;
+      align-items: center;
+    }
+    .input-group label {
+      width: 150px;
+      color: #fff;
+    }
+    select, input {
+      padding: 5px;
+      margin-left: 10px;
+      width: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #ff6200;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #e65c00;
+    }
+    #result {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #ff6200;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Price Calculator</h1>
-    <div>
+    <h1>Commission Price Calculator</h1>
+    <div class="image-area">
+      <!-- Здесь вы можете вручную вставить изображение, заменив src на путь к файлу -->
+      <!-- <img src="your-image.jpg" alt="Commission Image" style="max-width: 100%; max-height: 100%;"> -->
+    </div>
+    <div class="input-group">
       <label for="type">Select Type:</label>
       <select id="type">
         <option value="50">Sketch ($50)</option>
@@ -25,20 +77,20 @@
         <option value="150">Full ($150)</option>
       </select>
     </div>
-    <div>
-      <label for="extraPictures">Extra Pictures ($40/$80/$120):</label>
+    <div class="input-group">
+      <label for="extraPictures">Number of Pictures:</label>
       <input type="number" id="extraPictures" min="0" value="0">
     </div>
-    <div>
-      <label for="extraCharacters">Extra Characters ($30/$75/$110):</label>
-      <input type="number" id="extraCharacters" min="0" value="0">
+    <div class="input-group">
+      <label for="extraCharacters">Number of Characters:</label>
+      <input type="number" id="extraCharacters" min="0" value="0" readonly>
     </div>
-    <div>
-      <label for="altVersion">Alt Version (% of base price):</label>
+    <div class="input-group">
+      <label for="altVersion">Number of Versions:</label>
       <input type="number" id="altVersion" min="0" max="100" value="0">%
     </div>
     <button onclick="calculatePrice()">Calculate</button>
-    <div id="result">Total: $0</div>
+    <div id="result">Total: $0.00</div>
   </div>
 
   <script src="script.js"></script>
