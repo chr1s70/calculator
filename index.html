@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Price Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #fff; text-align: center; padding: 20px; }
+    h1 { color: #ff6200; }
+    .container { max-width: 600px; margin: 0 auto; }
+    select, input { padding: 5px; margin: 5px; }
+    button { padding: 10px 20px; background-color: #ff6200; color: #fff; border: none; cursor: pointer; }
+    button:hover { background-color: #e65c00; }
+    #result { font-size: 1.5em; margin-top: 20px; color: #ff6200; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Price Calculator</h1>
+    <div>
+      <label for="type">Select Type:</label>
+      <select id="type">
+        <option value="50">Sketch ($50)</option>
+        <option value="100">Render ($100)</option>
+        <option value="150">Full ($150)</option>
+      </select>
+    </div>
+    <div>
+      <label for="extraPictures">Extra Pictures ($40/$80/$120):</label>
+      <input type="number" id="extraPictures" min="0" value="0">
+    </div>
+    <div>
+      <label for="extraCharacters">Extra Characters ($30/$75/$110):</label>
+      <input type="number" id="extraCharacters" min="0" value="0">
+    </div>
+    <div>
+      <label for="altVersion">Alt Version (% of base price):</label>
+      <input type="number" id="altVersion" min="0" max="100" value="0">%
+    </div>
+    <button onclick="calculatePrice()">Calculate</button>
+    <div id="result">Total: $0</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
