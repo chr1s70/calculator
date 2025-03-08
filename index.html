@@ -23,26 +23,35 @@
       margin: 0 auto;
     }
     .image-area {
-      width: 100%;
-      height: 300px;
+      width: 1280px;
+      height: 960px;
       background-color: #fff;
-      margin-bottom: 20px;
+      margin: 0 auto 20px auto;
       border: 2px dashed #ccc;
+      overflow: hidden; /* Чтобы изображение не вылезало за пределы */
+    }
+    .image-area img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* Сохраняет пропорции изображения */
     }
     .input-group {
       margin: 15px 0;
-      text-align: left;
+      text-align: center;
       display: flex;
+      justify-content: center;
       align-items: center;
     }
     .input-group label {
       width: 150px;
       color: #fff;
+      margin-right: 10px;
     }
     select, input {
       padding: 5px;
-      margin-left: 10px;
-      width: 100px;
+      width: 100px; /* Фиксированный размер полей, как на примере */
+      height: 25px; /* Фиксированная высота для единообразия */
+      text-align: center;
     }
     button {
       padding: 10px 20px;
@@ -66,15 +75,15 @@
   <div class="container">
     <h1>Commission Price Calculator</h1>
     <div class="image-area">
-      <!-- Здесь вы можете вручную вставить изображение, заменив src на путь к файлу -->
-      <!-- <img src="your-image.jpg" alt="Commission Image" style="max-width: 100%; max-height: 100%;"> -->
+      <!-- Здесь вы можете вручную вставить изображение -->
+      <!-- <img src="your-image.jpg" alt="Commission Image"> -->
     </div>
     <div class="input-group">
       <label for="type">Select Type:</label>
       <select id="type">
-        <option value="50">Sketch ($50)</option>
-        <option value="100">Render ($100)</option>
-        <option value="150">Full ($150)</option>
+        <option value="50">Sketch</option>
+        <option value="100">Render</option>
+        <option value="150">Full</option>
       </select>
     </div>
     <div class="input-group">
@@ -87,12 +96,16 @@
     </div>
     <div class="input-group">
       <label for="altVersion">Number of Versions:</label>
-      <input type="number" id="altVersion" min="0" max="100" value="0">%
+      <input type="number" id="altVersion" min="0" value="0">
     </div>
     <button onclick="calculatePrice()">Calculate</button>
-    <div id="result">Total: $0.00</div>
+    <div id="result">Total: 0.00$</div>
   </div>
 
   <script src="script.js"></script>
 </body>
 </html>
+
+script.js
+javascript
+
