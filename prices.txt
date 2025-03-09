@@ -1,0 +1,20 @@
+Commission summary
+Sketch: 50
+Picture: 40
+Character: 25
+Version: 10
+-
+Render: 100
+Picture: 80
+Character: 75
+Version: 25
+-
+Full: 150
+Picture: 120
+Character: 110
+Version: 40
+-
+Custom: 200
+Picture: 150
+Character: 130
+Version: 50
