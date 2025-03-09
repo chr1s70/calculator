@@ -1,127 +1,145 @@
-let prices = { types: {} };
-
-async function loadPrices() {
-    try {
-        const response = await fetch('prices.txt');
-        const text = await response.text();
-        parsePrices(text);
-    } catch (error) {
-        console.error('Ошибка загрузки цен:', error);
-        document.getElementById('error').style.display = 'block';
-        // Значения по умолчанию в случае ошибки
-        prices = {
-            types: {
-                "Sketch": { basePrice: 50, extraPicturePrice: 40, extraCharacterPrice: 25, versionPrice: 10 },
-                "Render": { basePrice: 100, extraPicturePrice: 80, extraCharacterPrice: 75, versionPrice: 25 },
-                "Full": { basePrice: 150, extraPicturePrice: 120, extraCharacterPrice: 110, versionPrice: 40 }
-            }
-        };
-        updateTypeSelect();
-    }
-}
-
-function parsePrices(text) {
-    const lines = text.trim().split('\n');
-    let currentType = null;
-
-    for (let line of lines) {
-        line = line.trim();
-        
-        if (line === 'Commission summary') continue;
-        if (line === '-') {
-            currentType = null;
-            continue;
+// Встроенные данные о ценах
+const prices = [
+    {
+        "type": "Sketch",
+        "basePrice": 50, // Базовая цена теперь фиксированная для типа
+        "pricing": {
+            "Extra Picture": 40,
+            "Extra Character": 25,
+            "Alt Version": 10
         }
-
-        const [key, value] = line.split(':').map(part => part.trim());
-        
-        if (!value) { // Это новый тип
-            currentType = key;
-            prices.types[currentType] = {};
-        } else if (currentType) {
-            const price = parseInt(value) || 0;
-            switch(key) {
-                case 'Picture':
-                    prices.types[currentType].extraPicturePrice = price;
-                    break;
-                case 'Character':
-                    prices.types[currentType].extraCharacterPrice = price;
-                    break;
-                case 'Version':
-                    prices.types[currentType].versionPrice = price;
-                    break;
-                default:
-                    prices.types[currentType].basePrice = price;
-            }
+    },
+    {
+        "type": "Render",
+        "basePrice": 100, // Базовая цена теперь фиксированная для типа
+        "pricing": {
+            "Extra Picture": 80,
+            "Extra Character": 75,
+            "Alt Version": 25
+        }
+    },
+    {
+        "type": "Full",
+        "basePrice": 150, // Базовая цена теперь фиксированная для типа
+        "pricing": {
+            "Extra Picture": 120,
+            "Extra Character": 110,
+            "Alt Version": 40
         }
     }
-    
-    updateTypeSelect();
-}
+];
 
-function updateTypeSelect() {
-    const typeSelect = document.getElementById('type');
-    typeSelect.innerHTML = '';
-    Object.keys(prices.types).forEach(type => {
-        const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type;
-        typeSelect.appendChild(option);
-    });
-}
-
-window.onload = async function() {
-    await loadPrices();
+function initializeInterface() {
+    createTypeSelect();
+    createDynamicInputs();
     updateTooltips();
     calculatePrice();
     addMobileTooltipSupport();
-};
+}
+
+function createTypeSelect() {
+    const typeSelect = document.getElementById('type');
+    typeSelect.innerHTML = '';
+    prices.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.type;
+        option.textContent = item.type;
+        typeSelect.appendChild(option);
+    });
+    typeSelect.addEventListener('change', () => {
+        createDynamicInputs();
+        updateTooltips();
+        calculatePrice();
+    });
+}
+
+function createDynamicInputs() {
+    const inputContainer = document.getElementById('dynamicInputs');
+    inputContainer.innerHTML = ''; // Очищаем предыдущие элементы
+
+    const selectedType = document.getElementById('type').value;
+    const typeData = prices.find(item => item.type === selectedType);
+    if (!typeData) return;
+    const pricing = typeData.pricing;
+
+    Object.keys(pricing).forEach((key, index) => {
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group';
+
+        const label = document.createElement('label');
+        label.className = 'tooltip';
+        label.htmlFor = `input-${index}`;
+        label.innerText = `${key}: `;
+        
+        const tooltipSpan = document.createElement('span');
+        tooltipSpan.className = 'tooltiptext';
+        tooltipSpan.id = `tooltip-${index}`;
+        tooltipSpan.innerText = `+$${pricing[key]}`;
+        label.appendChild(tooltipSpan);
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `input-${index}`;
+        input.name = key;
+        input.min = '0';
+        input.max = '10';
+        input.value = '0';
+        input.addEventListener('input', () => {
+            updateTooltips();
+            calculatePrice();
+        });
+
+        inputGroup.appendChild(label);
+        inputGroup.appendChild(input);
+        inputContainer.appendChild(inputGroup);
+    });
+}
 
 function updateTooltips() {
-    const type = document.getElementById('type').value;
-    const typePrices = prices.types[type] || {};
+    const selectedType = document.getElementById('type').value;
+    const typeData = prices.find(item => item.type === selectedType);
+    const pricing = typeData.pricing;
 
-    document.getElementById('typeTooltip').innerText = `+$${typePrices.basePrice || 0}`;
-    document.getElementById('picturesTooltip').innerText = `+$${typePrices.extraPicturePrice || 0}`;
-    document.getElementById('charactersTooltip').innerText = `+$${typePrices.extraCharacterPrice || 0}`;
-    document.getElementById('versionsTooltip').innerText = `+$${typePrices.versionPrice || 0}`;
+    Object.keys(pricing).forEach((key, index) => {
+        const tooltip = document.getElementById(`tooltip-${index}`);
+        if (tooltip) {
+            tooltip.innerText = `+$${pricing[key]}`;
+        }
+    });
 }
 
 function calculatePrice() {
-    const type = document.getElementById('type').value;
-    const extraPictures = parseInt(document.getElementById('extraPictures').value) || 0;
-    const characters = parseInt(document.getElementById('characters').value) || 0;
-    const altVersion = parseInt(document.getElementById('altVersion').value) || 0;
+    const selectedType = document.getElementById('type').value;
+    const typeData = prices.find(item => item.type === selectedType);
+    const pricing = typeData.pricing;
+    const basePrice = typeData.basePrice || 0;
 
-    const typePrices = prices.types[type] || {};
-    const basePrice = typePrices.basePrice || 0;
-    const extraPicturePrice = typePrices.extraPicturePrice || 0;
-    const extraCharacterPrice = typePrices.extraCharacterPrice || 0;
-    const versionPrice = typePrices.versionPrice || 0;
+    let total = basePrice; // Базовая цена добавляется автоматически
+    let summaryText = "Commission summary\n";
+    summaryText += `Type: ${selectedType}\n`;
 
-    let total = basePrice;
-    const additionalPictures = extraPictures > 1 ? extraPictures - 1 : 0;
-    total += additionalPictures * extraPicturePrice;
-    total += characters * extraCharacterPrice;
-    total += altVersion * versionPrice;
+    Object.keys(pricing).forEach((key, index) => {
+        const input = document.getElementById(`input-${index}`);
+        const quantity = parseInt(input.value) || 0;
+        const price = pricing[key];
+        total += price * quantity; // Умножаем цену на количество
+        summaryText += `${key}: ${quantity}\n`;
+    });
 
     document.getElementById('result').innerHTML = `Total: ${total.toFixed(2)}$`;
-
-    let summaryText = "Commission summary\n";
-    summaryText += `Type: ${type}\n`;
-    summaryText += `Number of Pictures: ${extraPictures}\n`;
-    summaryText += `Number of Characters: ${characters}\n`;
-    summaryText += `Number of Versions: ${altVersion}\n`;
     summaryText += `Total: ${total.toFixed(2)}$`;
-
     document.getElementById('summary').innerText = summaryText;
 }
 
 function resetForm() {
-    document.getElementById('type').value = Object.keys(prices.types)[0] || 'Sketch';
-    document.getElementById('extraPictures').value = '1';
-    document.getElementById('characters').value = '0';
-    document.getElementById('altVersion').value = '0';
+    const selectedType = document.getElementById('type').value;
+    const typeData = prices.find(item => item.type === selectedType);
+    const pricing = typeData.pricing;
+
+    Object.keys(pricing).forEach((key, index) => {
+        const input = document.getElementById(`input-${index}`);
+        input.value = '0';
+    });
     updateTooltips();
     calculatePrice();
 }
@@ -140,36 +158,23 @@ function addMobileTooltipSupport() {
     tooltips.forEach(tooltip => {
         tooltip.addEventListener('click', function(e) {
             e.stopPropagation();
-            
             tooltips.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-
-            timeoutId = setTimeout(() => {
-                this.classList.remove('active');
-            }, 3000);
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => this.classList.remove('active'), 3000);
         });
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', e => {
         tooltips.forEach(tooltip => {
             if (!tooltip.contains(e.target)) {
                 tooltip.classList.remove('active');
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                }
+                if (timeoutId) clearTimeout(timeoutId);
             }
         });
     });
 }
 
-document.getElementById('extraPictures').addEventListener('input', calculatePrice);
-document.getElementById('type').addEventListener('change', function() {
-    updateTooltips();
-    calculatePrice();
-});
-document.getElementById('characters').addEventListener('input', calculatePrice);
-document.getElementById('altVersion').addEventListener('input', calculatePrice);
+window.onload = () => {
+    initializeInterface();
+};
