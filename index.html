@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -219,32 +220,16 @@
       <img src="Prices.png" alt="Commission Image">
     </div>
     <div class="input-group">
-      <label for="type" class="tooltip">Select Type:<span class="tooltiptext" id="typeTooltip">+$0</span></label>
-      <select id="type">
-        <!-- Options will be populated dynamically -->
-      </select>
+      <label for="type">Select Type:</label>
+      <select id="type"></select>
     </div>
-    <div class="input-group">
-      <label for="extraPictures" class="tooltip">Number of Pictures:<span class="tooltiptext" id="picturesTooltip">+$0</span></label>
-      <input type="number" id="extraPictures" min="1" max="5" value="1">
-    </div>
-    <div class="input-group">
-      <label for="characters" class="tooltip">Number of Characters:<span class="tooltiptext" id="charactersTooltip">+$0</span></label>
-      <input type="number" id="characters" min="0" max="5" value="0">
-    </div>
-    <div class="input-group">
-      <label for="altVersion" class="tooltip">Number of Versions:<span class="tooltiptext" id="versionsTooltip">+$0</span></label>
-      <input type="number" id="altVersion" min="0" max="10" value="0">
-    </div>
+    <div id="dynamicInputs"></div>
     <div class="button-group">
       <button onclick="resetForm()">Reset</button>
     </div>
     <div id="result">Total: 0.00$</div>
     <div id="summary"></div>
     <button id="copyButton" onclick="copySummary()">Copy Summary</button>
-    <div id="error" style="color: red; display: none; margin-top: 15px;">
-      Error loading prices. Using default values.
-    </div>
   </div>
   <script src="script.js"></script>
 </body>
