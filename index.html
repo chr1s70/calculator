@@ -4,29 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Commission Price Generator</title>
-  <!-- Определяем цены в начале документа -->
-  <script>
-    const prices = {
-      types: {
-        "Sketch": {
-          basePrice: 50,
-          extraPicturePrice: 40,
-          extraCharacterPrice: 30
-        },
-        "Render": {
-          basePrice: 100,
-          extraPicturePrice: 80,
-          extraCharacterPrice: 75
-        },
-        "Full": {
-          basePrice: 150,
-          extraPicturePrice: 120,
-          extraCharacterPrice: 110
-        }
-      },
-      versionMultiplier: 0.3
-    };
-  </script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -43,7 +20,7 @@
       margin-bottom: 15px;
     }
     .container {
-      max-width: 600px; /* Подставь ширину твоего изображения Prices.png */
+      max-width: 600px;
       margin: 0 auto;
       width: 100%;
     }
@@ -59,7 +36,7 @@
       max-height: 80vh;
       object-fit: contain;
     }
-    .input-group, .character-input {
+    .input-group {
       margin: 10px 0;
       display: flex;
       justify-content: center;
@@ -68,8 +45,9 @@
       gap: 10px;
       width: 100%;
       max-width: 100%;
+      position: relative;
     }
-    .input-group label, .character-input label {
+    .input-group label {
       color: #fff;
       text-align: right;
       flex: 1;
@@ -78,6 +56,8 @@
       box-sizing: border-box;
       display: flex;
       align-items: center;
+      position: relative;
+      cursor: pointer;
     }
     select, input {
       padding: 5px;
@@ -127,7 +107,7 @@
       color: #fff;
       width: 100%;
       max-width: 100%;
-      white-space: pre-wrap; /* Сохраняем переносы строк */
+      white-space: pre-wrap;
     }
     #copyButton {
       margin-top: 10px;
@@ -140,12 +120,38 @@
     #copyButton:hover {
       background-color: #E67E00;
     }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: #FF8D00;
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9em;
+    }
+    .tooltip:hover .tooltiptext,
+    .tooltip.active .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
 
     @media (max-width: 768px) {
       .container {
         max-width: 90%;
       }
-      .input-group label, .character-input label {
+      .input-group label {
         width: 100%;
         text-align: center;
         padding-right: 0;
@@ -165,6 +171,10 @@
       .image-area img {
         max-height: 60vh;
       }
+      .tooltip .tooltiptext {
+        width: 100px;
+        margin-left: -50px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -174,7 +184,7 @@
       h1 {
         font-size: clamp(1.2em, 5vw, 1.5em);
       }
-      .input-group, .character-input {
+      .input-group {
         flex-direction: column;
         gap: 5px;
       }
@@ -196,6 +206,10 @@
       .image-area img {
         max-height: 40vh;
       }
+      .tooltip .tooltiptext {
+        width: 80px;
+        margin-left: -40px;
+      }
     }
   </style>
 </head>
@@ -206,21 +220,22 @@
       <img src="Prices.png" alt="Commission Image">
     </div>
     <div class="input-group">
-      <label for="type">Select Type:</label>
+      <label for="type" class="tooltip">Select Type:<span class="tooltiptext" id="typeTooltip">+$0</span></label>
       <select id="type">
-        <option value="Sketch">Sketch</option>
-        <option value="Render">Render</option>
-        <option value="Full">Full</option>
+        <!-- Options will be populated dynamically -->
       </select>
     </div>
     <div class="input-group">
-      <label for="extraPictures">Number of Pictures:</label>
-      <input type="number" id="extraPictures" min="1" value="1">
+      <label for="extraPictures" class="tooltip">Number of Pictures:<span class="tooltiptext" id="picturesTooltip">+$0</span></label>
+      <input type="number" id="extraPictures" min="1" max="5" value="1">
     </div>
-    <div id="characterInputs"></div>
     <div class="input-group">
-      <label for="altVersion">Number of Versions:</label>
-      <input type="number" id="altVersion" min="0" value="0">
+      <label for="characters" class="tooltip">Number of Characters:<span class="tooltiptext" id="charactersTooltip">+$0</span></label>
+      <input type="number" id="characters" min="0" max="5" value="0">
+    </div>
+    <div class="input-group">
+      <label for="altVersion" class="tooltip">Number of Versions:<span class="tooltiptext" id="versionsTooltip">+$0</span></label>
+      <input type="number" id="altVersion" min="0" max="10" value="0">
     </div>
     <div class="button-group">
       <button onclick="resetForm()">Reset</button>
@@ -228,117 +243,10 @@
     <div id="result">Total: 0.00$</div>
     <div id="summary"></div>
     <button id="copyButton" onclick="copySummary()">Copy Summary</button>
+    <div id="error" style="color: red; display: none; margin-top: 15px;">
+      Error loading prices. Using default values.
+    </div>
   </div>
-
-  <script>
-    // Массив для хранения значений персонажей для каждой картинки
-    let characterValues = [];
-
-    // Автоматический вызов функции при загрузке страницы
-    window.onload = function() {
-      updateCharacterInputs();
-      calculatePrice();
-    };
-
-    // Функция для обновления полей ввода персонажей
-    function updateCharacterInputs() {
-      const extraPictures = parseInt(document.getElementById('extraPictures').value);
-      const characterInputsDiv = document.getElementById('characterInputs');
-      
-      if (characterValues.length === 0 || characterValues.length < extraPictures) {
-        while (characterValues.length < extraPictures) {
-          characterValues.push(characterValues.length < 1 ? 1 : 1);
-        }
-      } else if (characterValues.length > extraPictures) {
-        characterValues = characterValues.slice(0, extraPictures);
-      }
-
-      characterInputsDiv.innerHTML = '';
-
-      for (let i = 0; i < extraPictures; i++) {
-        const div = document.createElement('div');
-        div.className = 'character-input';
-        div.innerHTML = `
-          <label for="characters_${i}">Number of Characters (Picture ${i + 1}):</label>
-          <input type="number" id="characters_${i}" min="1" value="${characterValues[i] || 1}">
-        `;
-        characterInputsDiv.appendChild(div);
-
-        document.getElementById(`characters_${i}`).addEventListener('input', function() {
-          characterValues[i] = parseInt(this.value);
-          calculatePrice();
-        });
-      }
-
-      calculatePrice();
-    }
-
-    // Функция для расчёта цены и генерации текста
-    function calculatePrice() {
-      const type = document.getElementById('type').value;
-      const extraPictures = parseInt(document.getElementById('extraPictures').value);
-      const altVersion = parseInt(document.getElementById('altVersion').value);
-
-      const typePrices = prices.types[type];
-      const basePrice = typePrices.basePrice;
-      const extraPicturePrice = typePrices.extraPicturePrice;
-      const extraCharacterPrice = typePrices.extraCharacterPrice;
-      const versionMultiplier = prices.versionMultiplier;
-
-      let total = basePrice;
-      const additionalPictures = extraPictures > 0 ? extraPictures - 1 : 0;
-      total += additionalPictures * extraPicturePrice;
-
-      let totalChargeableCharacters = 0;
-      for (let i = 0; i < extraPictures; i++) {
-        const charactersForPicture = parseInt(document.getElementById(`characters_${i}`).value) || 1;
-        if (charactersForPicture >= 2) {
-          const chargeableCharacters = charactersForPicture - 1;
-          totalChargeableCharacters += chargeableCharacters;
-        }
-      }
-      total += totalChargeableCharacters * extraCharacterPrice;
-
-      const versionCost = (basePrice * versionMultiplier) * altVersion;
-      total += versionCost;
-
-      document.getElementById('result').innerHTML = `Total: ${total.toFixed(2)}$`;
-
-      // Генерация текста для саммари
-      let summaryText = "Commission summary\n";
-      summaryText += `Type: ${type}\n`;
-      summaryText += `Number of Pictures: ${extraPictures}\n`;
-      for (let i = 0; i < extraPictures; i++) {
-        const characters = parseInt(document.getElementById(`characters_${i}`).value) || 1;
-        summaryText += `Number of Characters (Picture ${i + 1}): ${characters}\n`;
-      }
-      summaryText += `Number of Versions: ${altVersion}\n`;
-      summaryText += `Total: ${total.toFixed(2)}$`;
-
-      document.getElementById('summary').innerText = summaryText;
-    }
-
-    // Функция для сброса формы
-    function resetForm() {
-      document.getElementById('type').value = 'Sketch';
-      document.getElementById('extraPictures').value = '1';
-      document.getElementById('altVersion').value = '0';
-      characterValues = [1];
-      updateCharacterInputs();
-    }
-
-    // Функция для копирования текста
-    function copySummary() {
-      const summaryText = document.getElementById('summary').innerText;
-      navigator.clipboard.writeText(summaryText)
-        .then(() => alert('Summary copied to clipboard!'))
-        .catch(err => console.error('Ошибка копирования:', err));
-    }
-
-    // Автоматический пересчёт при изменении значений
-    document.getElementById('extraPictures').addEventListener('input', updateCharacterInputs);
-    document.getElementById('type').addEventListener('change', calculatePrice);
-    document.getElementById('altVersion').addEventListener('input', calculatePrice);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
