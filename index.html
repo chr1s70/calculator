@@ -105,9 +105,10 @@
       text-align: left;
       font-size: clamp(1em, 2.5vw, 1.2em);
       color: #fff;
-      width: 100%;
+      width: 100%; /* Устанавливаем ширину по умолчанию */
       max-width: 100%;
       white-space: pre-wrap;
+      box-sizing: border-box; /* Учитываем padding в ширине */
     }
     #copyButton {
       margin-top: 10px;
@@ -164,6 +165,7 @@
       .button-group {
         flex-direction: column;
         gap: 5px;
+        align-items: center; /* Центрируем элементы внутри button-group */
       }
       button {
         width: 70%;
@@ -174,6 +176,12 @@
       .tooltip .tooltiptext {
         width: 100px;
         margin-left: -50px;
+      }
+      #summary {
+        width: 100%; /* На мобильных устройствах ширина summary совпадает с шириной картинки */
+        max-width: none; /* Убираем ограничение max-width */
+        margin-left: auto;
+        margin-right: auto;
       }
     }
 
@@ -193,6 +201,7 @@
       }
       .button-group {
         flex-direction: column;
+        align-items: center; /* Уточняем центрирование */
       }
       button {
         width: 90%;
@@ -202,6 +211,10 @@
       }
       #summary {
         font-size: clamp(0.9em, 3vw, 1em);
+        width: 100%; /* Убедимся, что ширина совпадает с картинкой */
+        max-width: none;
+        margin-left: auto;
+        margin-right: auto;
       }
       .image-area img {
         max-height: 40vh;
