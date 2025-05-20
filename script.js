@@ -11,20 +11,20 @@ const prices = [
     },
     {
         "type": "Render",
+        "basePrice": 100,
+        "pricing": {
+            "Extra Picture": 80,
+            "Extra Character": 75,
+            "Alt Version": 25
+        }
+    },
+    {
+        "type": "Full",
         "basePrice": 150,
         "pricing": {
             "Extra Picture": 120,
             "Extra Character": 110,
             "Alt Version": 40
-        }
-    },
-    {
-        "type": "Full",
-        "basePrice": 200,
-        "pricing": {
-            "Extra Picture": 160,
-            "Extra Character": 150,
-            "Alt Version": 50
         }
     }
 ];
