@@ -2,16 +2,7 @@
 const prices = {
   art: [
     {
-      type: "Sketch",
-      basePrice: 75,
-      pricing: {
-        "Extra Picture": 60,
-        "Extra Character": 35,
-        "Alt Version": 15
-      }
-    },
-    {
-      type: "Render",
+      type: "Flat render",
       basePrice: 100,
       pricing: {
         "Extra Picture": 80,
@@ -20,21 +11,21 @@ const prices = {
       }
     },
     {
-      type: "Full",
-      basePrice: 150,
+      type: "Full render",
+      basePrice: 200,
       pricing: {
-        "Extra Picture": 120,
-        "Extra Character": 110,
-        "Alt Version": 40
+        "Extra Picture": 160,
+        "Extra Character": 150,
+        "Alt Version": 50
       }
     }
   ],
   character: {
     basePrice: 0,
     pricing: {
-      "Number of Views": 75,
-      "Number of Close-up Views": 35,
-      "Number of Alt Versions": 15
+      "Number of Views": 100,
+      "Number of Close-up Views": 50,
+      "Number of Alt Versions": 30
     }
   }
 };
