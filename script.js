@@ -3,29 +3,29 @@ const prices = {
   art: [
     {
       type: "Flat render",
-      basePrice: 100,
+      basePrice: 150,
       pricing: {
-        "Extra Picture": 80,
-        "Extra Character": 75,
-        "Alt Version": 25
+        "Extra Picture": 120,
+        "Extra Character": 110,
+        "Alt Version": 40
       }
     },
     {
       type: "Full render",
-      basePrice: 200,
+      basePrice: 250,
       pricing: {
-        "Extra Picture": 160,
-        "Extra Character": 150,
-        "Alt Version": 50
+        "Extra Picture": 200,
+        "Extra Character": 180,
+        "Alt Version": 60
       }
     }
   ],
   character: {
     basePrice: 0,
     pricing: {
-      "Number of Views": 100,
-      "Number of Close-up Views": 50,
-      "Number of Alt Versions": 30
+      "Number of Views": 150,
+      "Number of Close-up Views": 75,
+      "Number of Alt Versions": 100
     }
   }
 };
