@@ -25,7 +25,7 @@ const prices = {
     pricing: {
       "Number of Views": 150,
       "Number of Close-up Views": 75,
-      "Number of Alt Versions": 100
+      "Number of Alt Versions": 75
     }
   }
 };
