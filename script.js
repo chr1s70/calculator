@@ -12,11 +12,11 @@ const prices = {
     },
     {
       type: "Full render",
-      basePrice: 250,
+      basePrice: 300,
       pricing: {
-        "Extra Picture": 200,
-        "Extra Character": 180,
-        "Alt Version": 60
+        "Extra Picture": 240,
+        "Extra Character": 220,
+        "Alt Version": 80
       }
     }
   ],
