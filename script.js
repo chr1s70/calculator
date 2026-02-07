@@ -1,4 +1,4 @@
-// Встроенные данные о ценах
+// Prices
 const prices = {
   art: [
     {
@@ -86,7 +86,7 @@ function createDynamicInputs(tab) {
     input.id = `input-${tab}-${index}`;
     input.name = key;
     input.min = '0';
-    input.max = '10';
+    input.max = '3';
     input.value = '0';
     input.addEventListener('input', () => {
       updateTooltips(tab);
@@ -97,6 +97,14 @@ function createDynamicInputs(tab) {
     inputGroup.appendChild(input);
     inputContainer.appendChild(inputGroup);
   });
+
+  // Для art добавляем начальное значение тултипа скидки
+  if (tab === 'art') {
+    const discountTooltip = document.getElementById('tooltip-discount-art');
+    if (discountTooltip) {
+      discountTooltip.innerText = "Up to 15% (step 5%)";
+    }
+  }
 }
 
 function updateTooltips(tab) {
@@ -113,6 +121,7 @@ function updateTooltips(tab) {
 
 function calculatePrice(tab) {
   const typeData = tab === 'art' ? prices[tab].find(item => item.type === document.getElementById(`type-${tab}`).value) : prices[tab];
+  if (!typeData) return;
   const pricing = typeData.pricing;
   const basePrice = typeData.basePrice || 0;
 
@@ -132,17 +141,38 @@ function calculatePrice(tab) {
     }
   });
 
-  const discountCheckbox = document.getElementById(`discount-${tab}`);
-  const discountApplied = discountCheckbox.checked;
-  let finalTotal = total;
-  if (discountApplied) {
-    finalTotal = total * 0.85;
-    summaryText += `Discount: 15% (-${(total * 0.15).toFixed(2)}$)\n`;
+  // ────────────────────────────── СКИДКА ──────────────────────────────
+  let discountPercent = 0;
+  let discountText = "None";
+
+  if (tab === 'art') {
+    const discountInput = document.getElementById('discount-level-art');
+    discountPercent = parseInt(discountInput?.value) || 0;
+    discountPercent = Math.min(Math.max(discountPercent, 0), 15); // защита
+    if (discountPercent > 0) {
+      discountText = `${discountPercent}% (-${(total * discountPercent / 100).toFixed(2)}$)`;
+    }
+
+    // обновляем тултип при расчёте
+    const tooltip = document.getElementById('tooltip-discount-art');
+    if (tooltip) {
+      tooltip.innerText = discountPercent > 0 ? `-${discountPercent}%` : "Up to 15%";
+    }
   } else {
-    summaryText += `Discount: None\n`;
+    // character — старая логика
+    const discountCheckbox = document.getElementById(`discount-${tab}`);
+    const discountApplied = discountCheckbox.checked;
+    if (discountApplied) {
+      discountPercent = 15;
+      discountText = `15% (-${(total * 0.15).toFixed(2)}$)`;
+    }
   }
 
+  const finalTotal = total * (1 - discountPercent / 100);
+
   document.getElementById(`result-${tab}`).innerHTML = `Total: ${finalTotal.toFixed(2)}$`;
+
+  summaryText += `Discount: ${discountText}\n`;
   summaryText += `Total: ${finalTotal.toFixed(2)}$`;
   document.getElementById(`summary-${tab}`).innerText = summaryText;
 }
@@ -153,9 +183,16 @@ function resetForm(tab) {
 
   Object.keys(pricing).forEach((key, index) => {
     const input = document.getElementById(`input-${tab}-${index}`);
-    input.value = '0';
+    if (input) input.value = '0';
   });
-  document.getElementById(`discount-${tab}`).checked = false;
+
+  if (tab === 'art') {
+    const discountInput = document.getElementById('discount-level-art');
+    if (discountInput) discountInput.value = '0';
+  } else {
+    document.getElementById(`discount-${tab}`).checked = false;
+  }
+
   updateTooltips(tab);
   calculatePrice(tab);
 }
@@ -177,8 +214,8 @@ function openTab(tab) {
   calculatePrice(tab);
 }
 
-function toggleFAQ(tab) {
-  const faqContent = document.getElementById(`faq-content-${tab}`);
+function toggleFAQ(id) {
+  const faqContent = document.getElementById(`faq-content-${id}`);
   faqContent.classList.toggle('active');
 }
 
