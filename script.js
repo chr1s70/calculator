@@ -98,7 +98,7 @@ function createDynamicInputs(tab) {
     inputContainer.appendChild(inputGroup);
   });
 
-  // Для art добавляем начальное значение тултипа скидки
+  // Art tooltip discount
   if (tab === 'art') {
     const discountTooltip = document.getElementById('tooltip-discount-art');
     if (discountTooltip) {
@@ -141,7 +141,7 @@ function calculatePrice(tab) {
     }
   });
 
-  // ────────────────────────────── СКИДКА ──────────────────────────────
+  // ────────────────────────────── Discount ──────────────────────────────
   let discountPercent = 0;
   let discountText = "None";
 
@@ -153,13 +153,13 @@ function calculatePrice(tab) {
       discountText = `${discountPercent}% (-${(total * discountPercent / 100).toFixed(2)}$)`;
     }
 
-    // обновляем тултип при расчёте
+    // Updating the tooltip during calculation
     const tooltip = document.getElementById('tooltip-discount-art');
     if (tooltip) {
       tooltip.innerText = discountPercent > 0 ? `-${discountPercent}%` : "Up to 15%";
     }
   } else {
-    // character — старая логика
+    // character — old logic
     const discountCheckbox = document.getElementById(`discount-${tab}`);
     const discountApplied = discountCheckbox.checked;
     if (discountApplied) {
